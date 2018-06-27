@@ -1,14 +1,20 @@
 ﻿using System;
+using Capstone.DAL;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Capstone.Tests
 {
 	[TestClass]
-	public class CampgroundSqlDALTests
+	public class CampgroundSqlDALTests : CampgroundDBTests
 	{
 		[TestMethod]
-		public void TestMethod1()
+		public void GetCampgroundsTest()
 		{
+			CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+
+			var campground = dal.GetCampgrounds("1");
+
+			Assert.AreEqual(1, campground.Count);
 		}
 	}
 }
