@@ -26,7 +26,8 @@ namespace Capstone.DAL
 				using (SqlConnection conn = new SqlConnection(connectionString))
 				{
 					conn.Open();
-					SqlCommand cmd = new SqlCommand("SELECT * FROM site WHERE site.campground_id = @campground_id;", conn);
+					//SqlCommand cmd = new SqlCommand("SELECT * FROM site WHERE site.campground_id = @campground_id;", conn);
+					SqlCommand cmd = new SqlCommand("SELECT * FROM site JOIN campground ON campground.campground_id = site.campground_id WHERE site.campground_id = @campground_id;", conn);
 					cmd.Parameters.AddWithValue("@campground_id", campgroundId);
 
 					SqlDataReader reader = cmd.ExecuteReader();
@@ -41,6 +42,7 @@ namespace Capstone.DAL
 						site.IsAccessible = Convert.ToBoolean(reader["accessible"]);
 						site.MaxRVLength = Convert.ToInt32(reader["max_rv_length"]);
 						site.HasUtilities = Convert.ToBoolean(reader["utilities"]);
+						site.DailyFee = Convert.ToDecimal(reader["daily_fee"]);
 
 						siteList.Add(site);
 					}
@@ -52,43 +54,6 @@ namespace Capstone.DAL
 			}
 			return siteList;
 		}
-
-
-		public IList<Campground> GetCampgrounds(string parkId)
-		{
-			List<Campground> campgroundList = new List<Campground>();
-
-			try
-			{
-				using (SqlConnection conn = new SqlConnection(connectionString))
-				{
-					conn.Open();
-					SqlCommand cmd = new SqlCommand("SELECT * FROM campground WHERE campground.park_id = @park_id;", conn);
-					cmd.Parameters.AddWithValue("@park_id", parkId);
-
-					SqlDataReader reader = cmd.ExecuteReader();
-					while (reader.Read())
-					{
-						Campground campground = new Campground();
-
-						campground.CampgroundId = Convert.ToInt32(reader["campground_id"]);
-						campground.ParkId = Convert.ToInt32(reader["park_id"]);
-						campground.Name = Convert.ToString(reader["name"]);
-						campground.OpenMonth = Convert.ToInt32(reader["open_from_mm"]);
-						campground.CloseMonth = Convert.ToInt32(reader["open_to_mm"]);
-						campground.DailyFee = Convert.ToDecimal(reader["daily_fee"]);
-
-						campgroundList.Add(campground);
-					}
-				}
-			}
-			catch (SqlException ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-			return campgroundList;
-		}
-
 
 	}
 }

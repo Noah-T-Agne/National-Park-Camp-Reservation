@@ -15,5 +15,6 @@ namespace Capstone.Models
 		public int MaxRVLength { get; set; }
 		public bool HasUtilities { get; set; }
 		public int CampgroundId { get; set; }
+		public decimal DailyFee { get; set; }
 	}
 }

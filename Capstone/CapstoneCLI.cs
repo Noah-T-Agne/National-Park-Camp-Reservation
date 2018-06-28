@@ -24,9 +24,11 @@ namespace Capstone
 		/// </summary>
 		public void RunCLI()
 		{
+			PrintTitle();
+			Console.WriteLine();
 			PrintHeader();
 			PrintMenu();
-
+			
 			while (true)
 			{
 				string command = Console.ReadLine();
@@ -104,43 +106,17 @@ namespace Capstone
 			}
 		}
 
-
-		//=========================================================
-		//=========================================================
-		//=========================================================
-		private void DisplayAvailableSites(IList<Campground> campgrounds)
+		private void DisplayAllReservations(IList<Site> sites)
 		{
-			Console.Write("Which campground (enter 0 to cancel)?:  ");
-			string campgroundId = Console.ReadLine();
 
-			Console.WriteLine("What is the arrival date?:");
-			Console.Write("Year (YYYY): ");
-			string arrivalYear = Console.ReadLine();
-			Console.Write("Month (MM): ");
-			string arrivalMonth = Console.ReadLine();
-			Console.Write("Day (DD): ");
-			string arrivalDay = Console.ReadLine();
-
-			Console.WriteLine();
-
-			Console.WriteLine("What is the departure date?:");
-			Console.Write("Year (YYYY): ");
-			string departureYear = Console.ReadLine();
-			Console.Write("Month (MM): ");
-			string departureMonth = Console.ReadLine();
-			Console.Write("Day (DD): ");
-			string departureDay = Console.ReadLine();
-
-			SiteSqlDAL dal = new SiteSqlDAL(DatabaseConnection);
-			IList<Site> sites = dal.GetSites(campgroundId);
-
+			ReservationSqlDAL dal = new ReservationSqlDAL(DatabaseConnection);
+			IList<Reservation> reservations = dal.GetReservations(sites[1].SiteId);
 			if (sites.Count > 0)
 			{
-				Console.WriteLine("Site Number".ToString().PadRight(15) + "Max. Occupancy".ToString().PadRight(15) + "Accessible?".ToString().PadRight(15) + "Max RV Length".ToString().PadRight(15) + "Utility".ToString().PadRight(15) + "Cost".ToString());
-				foreach (Site site in sites)
+				Console.WriteLine("Reservation Id".ToString().PadRight(15) + "Site Id".ToString().PadRight(15) + "Name".ToString().PadRight(15) + "Check In".ToString().PadRight(15) + "Check Out".ToString().PadRight(15) + "Book Date".ToString());
+				foreach (Reservation reservation in reservations)
 				{
-					// START HERE TOMORROW. THIS DOES NOT WORK**********************************************************8
-					Console.WriteLine(site.SiteNumber.ToString().PadRight(15) + site.MaxOccupancy.ToString().PadRight(15) + site.IsAccessible.ToString().PadRight(15) + site.MaxRVLength.ToString().PadRight(15) + site.HasUtilities.ToString().PadRight(15) + campgrounds[Convert.ToInt32(campgroundId) - 1].DailyFee.ToString("C2"));
+					Console.WriteLine(reservation.ReservationId.ToString().PadRight(15) + reservation.SiteId.ToString().PadRight(15) + reservation.Name.ToString().PadRight(15) + reservation.StartDate.ToString().PadRight(15) + reservation.EndDate.ToString().PadRight(15) + reservation.CreateDate.ToString()+ reservation.SiteNumber.ToString());
 				}
 			}
 			else
@@ -149,6 +125,84 @@ namespace Capstone
 
 			}
 			Console.ReadKey();
+
+
+		}
+
+		private void DisplayAvailableSites(IList<Campground> campgrounds)
+		{
+			
+
+			while (true)
+			{
+				Console.Write("Which campground (enter 0 to cancel)?:  ");
+				string campgroundId = Console.ReadLine();
+
+				if (campgroundId == "0")
+				{
+					break;
+				}
+				Console.WriteLine("What is the arrival date?:");
+				Console.Write("Year (YYYY): ");
+				string arrivalYear = Console.ReadLine();
+				Console.Write("Month (MM): ");
+				string arrivalMonth = Console.ReadLine();
+				Console.Write("Day (DD): ");
+				string arrivalDay = Console.ReadLine();
+
+				DateTime arrivalDate = new DateTime(Convert.ToInt32(arrivalYear), Convert.ToInt32(arrivalMonth), Convert.ToInt32(arrivalDay));
+
+				Console.WriteLine();
+
+				Console.WriteLine("What is the departure date?:");
+				Console.Write("Year (YYYY): ");
+				string departureYear = Console.ReadLine();
+				Console.Write("Month (MM): ");
+				string departureMonth = Console.ReadLine();
+				Console.Write("Day (DD): ");
+				string departureDay = Console.ReadLine();
+
+
+
+
+
+
+				DateTime departureDate = new DateTime(Convert.ToInt32(departureYear), Convert.ToInt32(departureMonth), Convert.ToInt32(departureDay));
+
+				SiteSqlDAL dal = new SiteSqlDAL(DatabaseConnection);
+				IList<Site> sites = dal.GetSites(campgroundId);
+
+
+				if (sites.Count > 0)
+				{
+					Console.WriteLine("Site Number".ToString().PadRight(15) + "Max. Occupancy".ToString().PadRight(15) + "Accessible?".ToString().PadRight(15) + "Max RV Length".ToString().PadRight(15) + "Utility".ToString().PadRight(15) + "Cost".ToString());
+					foreach (Site site in sites)
+					{
+						Console.WriteLine(site.SiteNumber.ToString().PadRight(15) + site.MaxOccupancy.ToString().PadRight(15) + site.IsAccessible.ToString().PadRight(15) + site.MaxRVLength.ToString().PadRight(15) + site.HasUtilities.ToString().PadRight(15) + site.DailyFee.ToString("C2"));
+					}
+				}
+				else
+				{
+					Console.WriteLine("**** SOLD TO PRIVATE CORPORATION-TEDDY ROOSEVELT SPINNING IN GRAVE ****");
+
+				}
+				Console.WriteLine();
+				Console.Write("Which site should be reserved (enter 0 to cancel)? ");
+				string siteSelection = Console.ReadLine();
+
+				while (true)
+				{
+					if (siteSelection == "0")
+					{
+						break;
+					}
+
+					Console.Write("What name should the reservation be made under? ");
+					string reservationName = Console.ReadLine();
+
+				}
+
+			}
 		}
 		//=========================================================
 		//=========================================================
@@ -189,9 +243,13 @@ namespace Capstone
 			IList<Campground> campgrounds = dal.GetCampgrounds(parkId);
 			if (campgrounds.Count > 0)
 			{
+				Console.WriteLine("ID".PadRight(10) + "Name".PadRight(30) + "Open".ToString().PadRight(10) + "Close".ToString().PadRight(10) + "Daily Fee".ToString().PadRight(10));
+
+				
 				foreach (Campground campground in campgrounds)
 				{
-					Console.WriteLine(campground.CampgroundId.ToString().PadRight(10) + campground.Name.PadRight(40) + campground.OpenMonth.ToString().PadRight(40) + campground.CloseMonth.ToString().PadRight(40) + campground.DailyFee.ToString("C2").PadRight(40));
+					Console.WriteLine((Convert.ToInt32(campground.CampgroundId)).ToString().PadRight(10) + campground.Name.PadRight(30) + campground.OpenMonth.ToString().PadRight(10) + campground.CloseMonth.ToString().PadRight(10) + campground.DailyFee.ToString("C2").PadRight(10));
+					
 				}
 			}
 			else
@@ -210,7 +268,7 @@ namespace Capstone
 
 		private void PrintMenu()
 		{
-			Console.Clear();
+			//Console.Clear();
 			Console.WriteLine("Main Menu Please type in a command");
 			Console.WriteLine(" 1 - Show all Parks");
 			//Console.WriteLine(" 2 - Show all employees");
@@ -227,6 +285,29 @@ namespace Capstone
 			Console.WriteLine();
 
 		}
+		private static void PrintTitle()
+		{
+			Console.ForegroundColor = ConsoleColor.DarkGreen;
+			Console.WriteLine(@"   .syyyyyyyyyyyyyyyyyyyyyyyyyyyys.	  __  __ ___ ________  ___  __  __ ___ __     ");
+			Console.WriteLine(@"   m+           \    /           +m	  ||\ ||// \\| || ||| // \\ ||\ ||// \\||     ");
+			Console.WriteLine(@"   M-            \  /            -M	  ||\\||||=||  ||  ||((   ))||\\||||=||||     ");
+			Console.WriteLine(@"   M-            /MM\            -M	  || \|||| ||  ||  || \\_// || \|||| ||||==|| ");
+			Console.WriteLine(@"   M-           /mMMm\           -M	  ____  ___ ____ __ ___  ");
+			Console.WriteLine(@"   M-          /mMMMMm\          -M	  || \\// \\|| \\|| ///   ");
+			Console.WriteLine(@"   M-         /mMMMMMMm\         -M	  ||_//||=||||_//||<< 	  ");
+			Console.WriteLine(@"   M-        /mMMMMMMMMm\        -M	  ||   || |||| \\|| \\\   ");
+			Console.WriteLine(@"   M-       /mMMMMMMMMMMm\       -M	   ___ ___ ___  _______  __ ________ ____");
+			Console.WriteLine(@"   M-      /mMMMMMMMMMMMMm\      -M	  //  // \\||\\//|||| \\(( \||| || |||	");
+			Console.WriteLine(@"   M-     /mMMMMMMMMMMMMMMm\     -M	 ((   ||=|||| \/ ||||_// \\ ||  ||  ||==");
+			Console.WriteLine(@"   M-    /mMMMMVVVVVVVVMMMMm\    -M	  \\__|| ||||    ||||   \_))||  ||  ||___");
+			Console.WriteLine(@"   M-   /mMMMMM|      |MMMMMm\   -M	  ____  ____ __  ________ __ __ ___ ________  ___  __  __     ");
+			Console.WriteLine(@"   M-  /mMMMMMM|      |MMMMMMm\  -M	  || \\||   (( \||   || \\|| ||// \\| || ||| // \\ ||\ ||     ");
+			Console.WriteLine(@"   M-./mMMMMMMM|______|MMMMMMMm\.-M	  ||_//||==  \\ ||== ||_//\\ //||=||  ||  ||((   ))||\\||     ");
+			Console.WriteLine(@"   N+............................+N	  || \\||___\_))||___|| \\ \V/ || ||  ||  || \\_// || \||     ");
+			Console.WriteLine(@"   .syyyyyyyyyyyyyyyyyyyyyyyyyyyys.      ");
+			Console.ResetColor();
+		}
+
 
 	}
 }

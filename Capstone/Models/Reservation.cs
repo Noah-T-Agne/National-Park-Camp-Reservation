@@ -14,6 +14,7 @@ namespace Capstone.Models
 		public DateTime EndDate { get; set; }
 		public string Name { get; set; }
 		public DateTime CreateDate { get; set; }
+		public int SiteNumber { get; set; }
 
 	}
 }
