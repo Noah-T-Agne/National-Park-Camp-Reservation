@@ -23,7 +23,7 @@ namespace Capstone.Tests
 		{
 			ParkSqlDAL dal = new ParkSqlDAL(ConnectionString);
 
-			var park = dal.GetParkInfo("1");
+			var park = dal.GetParkInfo(1);
 
 			Assert.AreEqual("Test Park", park.Name);
 		}

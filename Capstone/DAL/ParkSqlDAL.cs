@@ -10,15 +10,21 @@ namespace Capstone.DAL
 {
 	public class ParkSqlDAL
 	{
+		// PROPERTY
 		private readonly string connectionString;
 
-
-
+		// CONSTRUCTOR
 		public ParkSqlDAL(string databaseConnectionString)
 		{
 			connectionString = databaseConnectionString;
 		}
 
+		// METHODS
+
+		/// <summary>
+		/// Queries a list of all parks
+		/// </summary>
+		/// <returns>List of all parks from query</returns>
 		public IList<Park> GetParks()
 		{
 			List<Park> parkList = new List<Park>();
@@ -56,7 +62,12 @@ namespace Capstone.DAL
 
 		}
 
-		public Park GetParkInfo(string parkId)
+		/// <summary>
+		/// Queries information about the selected park
+		/// </summary>
+		/// <param name="parkId"></param>
+		/// <returns>Returns a park, which contains all of the relevant information about that park</returns>
+		public Park GetParkInfo(int parkId)
 		{
 			Park park = new Park();
 			try
@@ -70,8 +81,6 @@ namespace Capstone.DAL
 					SqlDataReader reader = cmd.ExecuteReader();
 					while (reader.Read())
 					{
-						
-
 						park.ParkId = Convert.ToInt32(reader["park_id"]);
 						park.Name = Convert.ToString(reader["name"]);
 						park.Location = Convert.ToString(reader["location"]);
@@ -90,10 +99,5 @@ namespace Capstone.DAL
 
 			return park;
 		}
-
-
-
-
-
 	}
 }

@@ -16,5 +16,12 @@ namespace Capstone.Models
 		public bool HasUtilities { get; set; }
 		public int CampgroundId { get; set; }
 		public decimal DailyFee { get; set; }
+
+		public string CampgroundName { get; set; }
+		public int CampgroundOpenMonth { get; set; }
+		public int CampgroundCloseMonth { get; set; }
+		public int ParkId { get; set; }
+		public string ParkName { get; set; }
+		public string ParkLocation { get; set; }
 	}
 }

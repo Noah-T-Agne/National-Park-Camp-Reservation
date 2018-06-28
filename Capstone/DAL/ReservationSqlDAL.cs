@@ -22,7 +22,7 @@ namespace Capstone.DAL
 
 		}
 
-		public IList<Reservation> GetReservations(int siteId)
+		public IList<Reservation> GetReservations(int campgroundId, int parkId, int siteId)
 		{
 			List<Reservation> reservationList = new List<Reservation>();
 
@@ -31,7 +31,9 @@ namespace Capstone.DAL
 				using (SqlConnection conn = new SqlConnection(connectionString))
 				{
 					conn.Open();
-					SqlCommand cmd = new SqlCommand("SELECT * FROM reservation JOIN site ON site.site_id = reservation.site_id WHERE reservation.site_id = @site_id;", conn);
+					SqlCommand cmd = new SqlCommand("SELECT * FROM reservation JOIN site ON site.site_id = reservation.site_id JOIN campground ON campground.campground_id = site.campground_id JOIN park ON park.park_id = campground.park_id WHERE park.park_id = @park_id AND campground.campground.id = @campground.id AND site.site_id = @site_id;", conn);
+					cmd.Parameters.AddWithValue("@campground_id", campgroundId);
+					cmd.Parameters.AddWithValue("@park_id", parkId);
 					cmd.Parameters.AddWithValue("@site_id", siteId);
 
 					SqlDataReader reader = cmd.ExecuteReader();

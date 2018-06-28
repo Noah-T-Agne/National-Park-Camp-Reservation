@@ -12,11 +12,9 @@ namespace Capstone.Tests
 		{
 			SiteSqlDAL dal = new SiteSqlDAL(ConnectionString);
 
-			var site = dal.GetSites("1");
+			var site = dal.GetSites(1, 1);
 
 			Assert.AreEqual(1, site.Count);
-
-
 		}
 	}
 }

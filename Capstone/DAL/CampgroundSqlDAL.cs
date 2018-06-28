@@ -10,14 +10,23 @@ namespace Capstone.DAL
 {
 	public class CampgroundSqlDAL
 	{
+		// PROPERTY
 		private readonly string connectionString;
 
+		// CONSTRUCTOR
 		public CampgroundSqlDAL(string databaseConnection)
 		{
 			connectionString = databaseConnection;
 		}
 
-		public IList<Campground> GetCampgrounds(string parkId)
+		// METHOD
+
+		/// <summary>
+		/// Queries a list of campgrounds, filtered by selected park
+		/// </summary>
+		/// <param name="parkId">The unique identifier of a national park</param>
+		/// <returns>The campgrounds of the selected park</returns>
+		public IList<Campground> GetCampgrounds(int parkId)
 		{
 			List<Campground> campgroundList = new List<Campground>();
 
@@ -26,7 +35,7 @@ namespace Capstone.DAL
 				using (SqlConnection conn = new SqlConnection(connectionString))
 				{
 					conn.Open();
-					SqlCommand cmd = new SqlCommand("SELECT * FROM campground WHERE campground.park_id = @park_id ORDER BY park_id ASC;", conn);
+					SqlCommand cmd = new SqlCommand("SELECT * FROM campground JOIN park ON park.park_id = campground.park_id WHERE park.park_id = @park_id;", conn);
 					cmd.Parameters.AddWithValue("@park_id", parkId);
 
 					SqlDataReader reader = cmd.ExecuteReader();
@@ -40,6 +49,8 @@ namespace Capstone.DAL
 						campground.OpenMonth = Convert.ToInt32(reader["open_from_mm"]);
 						campground.CloseMonth = Convert.ToInt32(reader["open_to_mm"]);
 						campground.DailyFee = Convert.ToDecimal(reader["daily_fee"]);
+						campground.ParkLocation = Convert.ToString(reader["location"]);
+						campground.ParkName = Convert.ToString(reader["name"]);
 
 						campgroundList.Add(campground);
 					}
@@ -51,8 +62,5 @@ namespace Capstone.DAL
 			}
 			return campgroundList;
 		}
-
-
-
 	}
 }

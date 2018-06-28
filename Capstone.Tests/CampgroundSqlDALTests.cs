@@ -12,7 +12,7 @@ namespace Capstone.Tests
 		{
 			CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
 
-			var campground = dal.GetCampgrounds("1");
+			var campground = dal.GetCampgrounds(1);
 
 			Assert.AreEqual(1, campground.Count);
 		}
