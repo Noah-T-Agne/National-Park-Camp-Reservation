@@ -237,12 +237,14 @@ namespace Capstone
 				Console.Write("Which campground (enter 0 to cancel)?: ");
 				campgroundId = CLIHelper.GetInteger(Console.ReadLine());
 
+				decimal dailyFee = 0;
 				bool indexExists = false;
 				foreach (var campground in campgrounds)
 				{
 					if (campground.CampgroundId == campgroundId)
 					{
 						indexExists = true;
+						dailyFee = campground.DailyFee;
 						break;
 					}
 				}
@@ -254,11 +256,16 @@ namespace Capstone
 				else if (indexExists)
 				{
 					DateTime[] desiredReservationDates = SearchForCampgroundReservation(campgroundId, campgrounds);
-					int siteNumber = DisplayAvailableSites(parkId, campgroundId);
-					Reservation successfulReservation = CheckAvailableReservation(parkId, campgroundId, siteNumber, desiredReservationDates);
-					if (successfulReservation != null)
+					int[] sitePair = DisplayAvailableSites(parkId, campgroundId);
+					if (sitePair[1] == 0)
+					{
+						break;
+					}
+					Reservation successfulReservation = CheckAvailableReservation(parkId, campgroundId, sitePair[0], sitePair[1], desiredReservationDates);
+					if (successfulReservation.ReservationId != 0)
 					{
 						Console.WriteLine($"The reservation has been made and Confirmation ID is: {successfulReservation.ReservationId}");
+						Console.WriteLine($"The total cost of your stay is {((Convert.ToDecimal((successfulReservation.EndDate - successfulReservation.StartDate).TotalDays) + 1) * dailyFee).ToString("C2")}");
 						Console.WriteLine("Thank you for Camping! press any key to return to Main Menu");
 						Console.ReadKey();
 						break;
@@ -276,7 +283,7 @@ namespace Capstone
 		/// <param name="siteNumber"></param>
 		/// <param name="desiredReservationDates"></param>
 		/// <returns>Reservation at the selected site at the selected campground at the selected park</returns>
-		private Reservation CheckAvailableReservation(int parkId, int campgroundId, int siteNumber, DateTime[] desiredReservationDates)
+		private Reservation CheckAvailableReservation(int parkId, int campgroundId, int siteId, int siteNumber, DateTime[] desiredReservationDates)
 		{
 			ReservationSqlDAL dal = new ReservationSqlDAL(DatabaseConnection);
 			IList<Reservation> reservations = dal.GetReservations(parkId, campgroundId, siteNumber);
@@ -288,6 +295,7 @@ namespace Capstone
 				if ((desiredReservationDates[0] >= reservation.StartDate && desiredReservationDates[0] <= reservation.EndDate) || (desiredReservationDates[1] >= reservation.StartDate && desiredReservationDates[1] <= reservation.EndDate))
 				{
 					isValidReservation = false;
+					Console.WriteLine("Reservation already booked during all or part of this date range. Please select another date range.");
 					break;
 				}
 			}
@@ -295,7 +303,6 @@ namespace Capstone
 			{
 				Console.Write("Please Enter Reservation Name: ");
 				string reservationName = Console.ReadLine();
-				int siteId = reservations[0].SiteId;
 				successfulReservation = dal.AddReservation(siteId, reservationName, desiredReservationDates);
 			}
 			return successfulReservation;
@@ -383,10 +390,13 @@ namespace Capstone
 		/// <param name="parkId"></param>
 		/// <param name="campgroundId"></param>
 		/// <returns>Site number selected by user</returns>
-		private int DisplayAvailableSites(int parkId, int campgroundId)
+		private int[] DisplayAvailableSites(int parkId, int campgroundId)
 		{
 
-			int siteNumber;
+			
+			int siteNumber = 0;
+			int siteId = 0;
+			int[] sitePair = new int[2] { siteId, siteNumber };
 			while (true)
 			{
 				SiteSqlDAL dal = new SiteSqlDAL(DatabaseConnection);
@@ -415,15 +425,18 @@ namespace Capstone
 					if (siteNumber == site.SiteNumber)
 					{
 						validSite = true;
+						siteId = site.SiteId;
+						sitePair[0] = siteId;
+						sitePair[1] = site.SiteNumber;
 						break;
 					}
 				}
-				if (validSite)
+				if (validSite || siteNumber == 0)
 				{
 					break;
-				}			
+				}
 			}
-			return siteNumber;
+			return sitePair;
 		}
 	}
 }

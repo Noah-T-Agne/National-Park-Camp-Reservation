@@ -33,8 +33,7 @@ namespace Capstone.DAL
 					cmd.Parameters.AddWithValue("@to_date", desiredReservationDates[1]);
 					cmd.Parameters.AddWithValue("@create_date", DateTime.Today);
 
-					cmd.ExecuteNonQuery();
-
+					cmd.ExecuteNonQuery();					
 					SqlCommand cmd2 = new SqlCommand("SELECT TOP 1* FROM reservation ORDER BY reservation_id DESC;", conn);
 					SqlDataReader reader = cmd2.ExecuteReader();
 					while (reader.Read())
@@ -45,6 +44,7 @@ namespace Capstone.DAL
 						reservation.StartDate = Convert.ToDateTime(reader["from_date"]);
 						reservation.EndDate = Convert.ToDateTime(reader["to_date"]);
 						reservation.CreateDate = Convert.ToDateTime(reader["create_date"]);
+						//reservation.DailyFee = Convert.ToDecimal(reader["daily_fee"]);
 					}
 				}
 			}
