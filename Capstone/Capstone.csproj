@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CapstoneCLI.cs" />
+    <Compile Include="CLIHelper.cs" />
     <Compile Include="DAL\CampgroundSqlDAL.cs" />
     <Compile Include="DAL\ParkSqlDAL.cs" />
     <Compile Include="DAL\ReservationSqlDAL.cs" />

@@ -91,6 +91,7 @@ namespace Capstone
 			Console.WriteLine(" 1 - Show all Parks");
 			Console.WriteLine(" Q - Quit");
 			Console.WriteLine();
+			Console.Write(">>  ");
 		}
 
 
@@ -100,24 +101,33 @@ namespace Capstone
 		/// <returns>The park id selected by user</returns>
 		private int DisplayAllParks()
 		{
-			ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
-			IList<Park> parks = dal.GetParks();
 			int parkSelection = 0;
-
-			if (parks.Count > 0)
+			while (true)
 			{
-				Console.WriteLine("Please select the national park that you wish to visit.");
-				foreach (Park park in parks)
+				ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
+				IList<Park> parks = dal.GetParks();
+				
+
+				if (parks.Count > 0)
 				{
-					Console.WriteLine(park.ParkId.ToString().PadRight(10) + park.Name.PadRight(40));
+					Console.WriteLine("Please select the national park that you wish to visit.");
+					foreach (Park park in parks)
+					{
+						Console.WriteLine(park.ParkId.ToString().PadRight(10) + park.Name.PadRight(40));
+					}
+					Console.Write(">>  ");
+					parkSelection = CLIHelper.GetInteger(Console.ReadLine());
+					if (parkSelection <= parks.Count && parkSelection > 0)
+					{
+						break;
+					}
+					Console.Clear();
 				}
-				parkSelection = Convert.ToInt32(Console.ReadLine());
+				else
+				{
+					Console.WriteLine("**** SOLD TO PRIVATE CORPORATION-TEDDY ROOSEVELT SPINNING IN GRAVE ****");
+				}
 			}
-			else
-			{
-				Console.WriteLine("**** SOLD TO PRIVATE CORPORATION-TEDDY ROOSEVELT SPINNING IN GRAVE ****");
-			}
-
 			return parkSelection;
 		}
 
@@ -148,7 +158,7 @@ namespace Capstone
 				Console.WriteLine("  2) Search for Reservation");
 				Console.WriteLine("  3) Return to Previous Screen");
 				Console.Write(">> ");
-				int parkInfoId = Convert.ToInt32(Console.ReadLine());
+				int parkInfoId = CLIHelper.GetInteger(Console.ReadLine());
 
 				int campgroundId = 0;
 				IList<Campground> campgrounds;
@@ -161,7 +171,7 @@ namespace Capstone
 					Console.WriteLine("  1) Search for Available Reservation");
 					Console.WriteLine("  2) Return to Previous Screen");
 					Console.Write(">> ");
-					int viewCampgroundsMenuSelection = Convert.ToInt32(Console.ReadLine());
+					int viewCampgroundsMenuSelection = CLIHelper.GetInteger(Console.ReadLine());
 
 					if (viewCampgroundsMenuSelection == 1)
 					{
@@ -169,8 +179,6 @@ namespace Capstone
 						campgrounds = DisplayCampgroundInfo(parkId);
 						campgroundId = SelectValidCampground(parkId, campgrounds);
 						break;
-						//SearchForCampgroundReservation(campgroundId, campgrounds);
-						//DisplayAvailableSites(parkId, campgroundId);
 					}
 				}
 				else if (parkInfoId == 2)
@@ -178,22 +186,11 @@ namespace Capstone
 					campgrounds = DisplayCampgroundInfo(parkId);
 					campgroundId = SelectValidCampground(parkId, campgrounds);
 					break;
-					//SearchForCampgroundReservation(campgroundId, campgrounds);
-
-
-					//DisplayAvailableSites(parkId, campgroundId);
 				}
 				else if (parkInfoId == 3)
 				{
 					break;
 				}
-
-				//if (campgroundId != 0)
-				//{
-				//	SearchForCampgroundReservation(campgroundId, campgrounds);
-				//}
-
-				//DisplayCampgroundInfo(parkId, campgroundId);
 			}
 		}
 
@@ -210,12 +207,12 @@ namespace Capstone
 			if (campgrounds.Count > 0)
 			{
 				Console.WriteLine("CAMPGROUNDS");
-				Console.WriteLine("ID".PadRight(10) + "Name".PadRight(30) + "Open".ToString().PadRight(10) + "Close".ToString().PadRight(10) + "Daily Fee".ToString().PadRight(10));
+				Console.WriteLine("ID".PadRight(10) + "Name".PadRight(40) + "Open".ToString().PadRight(10) + "Close".ToString().PadRight(10) + "Daily Fee".ToString().PadRight(10));
 
 
 				foreach (Campground campground in campgrounds)
 				{
-					Console.WriteLine((Convert.ToInt32(campground.CampgroundId)).ToString().PadRight(10) + campground.Name.PadRight(30) + campground.OpenMonth.ToString().PadRight(10) + campground.CloseMonth.ToString().PadRight(10) + campground.DailyFee.ToString("C2").PadRight(10));
+					Console.WriteLine((Convert.ToInt32(campground.CampgroundId)).ToString().PadRight(10) + campground.Name.PadRight(40) + campground.OpenMonth.ToString().PadRight(10) + campground.CloseMonth.ToString().PadRight(10) + campground.DailyFee.ToString("C2").PadRight(10));
 
 				}
 			}
@@ -238,7 +235,7 @@ namespace Capstone
 			while (true)
 			{
 				Console.Write("Which campground (enter 0 to cancel)?: ");
-				campgroundId = Convert.ToInt32(Console.ReadLine());
+				campgroundId = CLIHelper.GetInteger(Console.ReadLine());
 
 				bool indexExists = false;
 				foreach (var campground in campgrounds)
@@ -292,7 +289,6 @@ namespace Capstone
 				{
 					isValidReservation = false;
 					break;
-
 				}
 			}
 			if (isValidReservation)
@@ -301,12 +297,8 @@ namespace Capstone
 				string reservationName = Console.ReadLine();
 				int siteId = reservations[0].SiteId;
 				successfulReservation = dal.AddReservation(siteId, reservationName, desiredReservationDates);
-
 			}
 			return successfulReservation;
-
-
-
 		}
 
 		/// <summary>
@@ -333,28 +325,28 @@ namespace Capstone
 			while (true)
 			{
 				Console.WriteLine();
-				Console.WriteLine("What is the arrival date?:");
+				Console.WriteLine("What is the arrival date (YYYY-MM-DD) ?:");
 				Console.Write("Year (YYYY): ");
-				string arrivalYear = Console.ReadLine();
+				int arrivalYear = CLIHelper.GetInteger(Console.ReadLine());
 				Console.Write("Month (MM): ");
-				string arrivalMonth = Console.ReadLine();
+				int arrivalMonth = CLIHelper.GetInteger(Console.ReadLine());
 				Console.Write("Day (DD): ");
-				string arrivalDay = Console.ReadLine();
+				int arrivalDay = CLIHelper.GetInteger(Console.ReadLine());
 
-				DateTime arrivalDate = new DateTime(Convert.ToInt32(arrivalYear), Convert.ToInt32(arrivalMonth), Convert.ToInt32(arrivalDay));
+				DateTime arrivalDate = new DateTime(arrivalYear, arrivalMonth, arrivalDay);
 				desiredReservationDates[0] = arrivalDate;
 
 				Console.WriteLine();
 
 				Console.WriteLine("What is the departure date?:");
 				Console.Write("Year (YYYY): ");
-				string departureYear = Console.ReadLine();
+				int departureYear = CLIHelper.GetInteger(Console.ReadLine());
 				Console.Write("Month (MM): ");
-				string departureMonth = Console.ReadLine();
+				int departureMonth = CLIHelper.GetInteger(Console.ReadLine());
 				Console.Write("Day (DD): ");
-				string departureDay = Console.ReadLine();
+				int departureDay = CLIHelper.GetInteger(Console.ReadLine());
 
-				DateTime departureDate = new DateTime(Convert.ToInt32(departureYear), Convert.ToInt32(departureMonth), Convert.ToInt32(departureDay));
+				DateTime departureDate = new DateTime(departureYear, departureMonth, departureDay);
 				desiredReservationDates[1] = departureDate;
 
 				bool validDateRange = CheckDateRange(currentCampground, desiredReservationDates);
@@ -416,7 +408,7 @@ namespace Capstone
 				Console.WriteLine();
 				Console.Write("Which site should be reserved (enter 0 to cancel)? ");
 
-				siteNumber = Convert.ToInt32(Console.ReadLine());
+				siteNumber = CLIHelper.GetInteger(Console.ReadLine());
 				bool validSite = false;
 				foreach (var site in sites)
 				{
@@ -429,8 +421,7 @@ namespace Capstone
 				if (validSite)
 				{
 					break;
-				}
-				//DisplayAllReservations(sites);
+				}			
 			}
 			return siteNumber;
 		}
